@@ -1,0 +1,11 @@
+# Build artifacts
+*.bin
+*.lst
+*.map
+*.ram
+*.rom
+*.rst
+*.s
+*.sym
+*.lst
+*.s19
