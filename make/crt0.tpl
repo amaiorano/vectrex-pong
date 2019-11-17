@@ -57,29 +57,36 @@
 	.globl __start
 __start:
 
-; TODO: this code crashs
-	;; Call any "initializer" functions
-;	ldu	#s_.ctors
-__ctors_loop:
-;	ldy	,u++
-;	cmpy	#0
-;	beq	__ctors_done
-;	jsr	,y
-;	bra	__ctors_loop
-__ctors_done:
-
 	; copy .data and .bss areas to RAM
-	ldx	#l_.text
-	ldy	#0xc880
-	ldb	#0x26a
+	ldd #l_.text
+	addd #l_.ctors	; skip ctors, if any (handled later)
+	tfr d,x
+	ldy	#0xc880		; user ram
+	ldb	#0x26a		; 874 total - 256 stack = 618 (0x26a) bytes
 copyData:
 	lda	,x+
 	sta	,y+
 	decb
 	bne	copyData
 
+	; Call any "initializer" functions
+	lda #l_.ctors 	; init table size, usually 1 entry (2 bytes) to static init code
+	ldu	#s_.ctors	; load first init function
+ctorsLoop:
+	cmpa #0
+	beq ctorsDone
+	ldy	,u++ 	; load curr init func, u will point to next
+	jsr	,y		; run it
+	suba #2
+	jmp ctorsLoop
+ctorsDone:
+
 	; start C program
 	jmp	_main
+
+
+
+
 
 #music:
 #        .word   0xfee8
