@@ -57,34 +57,44 @@
 	.globl __start
 __start:
 
-	; copy .data and .bss areas to RAM
-	ldd #l_.text
-	addd #l_.ctors	; skip ctors, if any (handled later)
-	tfr d,x
-	ldy	#0xc880		; user ram
-	ldb	#0x26a		; 874 total - 256 stack = 618 (0x26a) bytes
-copyData:
-	lda	,x+
-	sta	,y+
-	decb
-	bne	copyData
-
-	; Call any "initializer" functions
-	lda #l_.ctors 	; init table size, usually 1 entry (2 bytes) to static init code
-	ldu	#s_.ctors	; load first init function
-ctorsLoop:
-	cmpa #0
-	beq ctorsDone
-	ldy	,u++ 	; load curr init func, u will point to next
-	jsr	,y		; run it
-	suba #2
-	jmp ctorsLoop
-ctorsDone:
-
-	; start C program
-	jmp	_main
-
-
+_crt0_init_data:
+	ldu		#s_.text
+	leau	l_.text,u
+	leau	l_.ctors,u			; skip constructors
+	ldy		#s_.data
+	ldx		#l_.data
+	beq		_crt0_init_objects
+_crt0_copy_data:
+	lda		,u+
+	sta		,y+
+	leax	-1,x
+	bne		_crt0_copy_data
+_crt0_init_objects:
+	ldu		#s_.ctors			; load first init function
+	ldx 	#l_.ctors 			; init table size, usually 1 entry (2 bytes) to static init code
+	beq		_crt0_init_bss
+_crt0_call_ctor:
+	ldy		,u++ 				; load curr init func
+	pshs	x
+	jsr		,y					; run it
+	puls	x
+	leax	-2,x
+	bne 	_crt0_call_ctor
+_crt0_init_bss:
+	ldy		#s_.bss
+	ldx		#l_.bss
+	beq		_crt0_startup
+_crt0_zero_bss:
+	clr		,y+
+	leax	-1,x
+	bne		_crt0_zero_bss
+_crt0_startup:
+	jsr		_main
+	tstb
+	ble		_crt0_restart
+	clr		0xcbfe;	cold reset
+_crt0_restart:
+	jmp 	0xf000;	rum
 
 
 
