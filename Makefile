@@ -19,6 +19,8 @@ LSTS += $(BINS:.bin=crt0.lst)
 CLST  = $(BINS:.bin=crt0.lst)
 RSTS  = $(BINS:.bin=.rst)
 RSTS += $(BINS:.bin=crt0.rst)
+HLRS  = $(BINS:.bin=.hlr)
+HLRS += $(BINS:.bin=crt0.hlr)
 MAPS  = $(BINS:.bin=.map)
 ROMS  = $(BINS:.bin=.rom)
 RAMS  = $(BINS:.bin=.ram)
@@ -29,7 +31,7 @@ ASRC += $(BINS:.bin=crt0.s)
 S19S  = $(BINS:.bin=.s19)
 S19S += $(BINS:.bin=_ram.s19)
 
-CLEAN_LIST= $(S19S) $(CRT0) $(ASRC) $(OBJS) $(RELS) $(LSTS) $(CLST) $(RSTS) $(MAPS) *~ $(RAMS) $(ROMS) $(SYMS) $(BINS)
+CLEAN_LIST= $(S19S) $(CRT0) $(ASRC) $(OBJS) $(RELS) $(LSTS) $(CLST) $(RSTS) $(MAPS) *~ $(RAMS) $(ROMS) $(SYMS) $(BINS) $(HLRS)
 
 .PHONY: clean all
 
