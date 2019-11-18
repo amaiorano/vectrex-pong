@@ -32,11 +32,23 @@ void* operator new(size_t, void* mem) {
 }
 
 void* memcpy(void* dest, const void* src, size_t size) {
+#if 0
     uint8_t* d = (uint8_t*)dest;
     uint8_t* s = (uint8_t*)src;
     while (size--) {
         *d++ = *s++;
     }
+#else
+    uint16_t* d = (uint16_t*)dest;
+    uint16_t* s = (uint16_t*)src;
+    while (size >= 2) {
+        *d++ = *s++;
+        size -= 2;
+    }
+    if (size) {
+        ((uint8_t&)*d) = *(uint8_t*)s;
+    }
+#endif
     return dest;
 }
 
@@ -51,7 +63,7 @@ public:
     void* Allocate(size_t bytes) {
         void* block = m_curr;
         m_curr += bytes;
-        assert(m_curr < m_buffer + MaxSize);
+        assert(m_curr < (m_buffer + MaxSize));
         return block;
     }
 
@@ -69,8 +81,6 @@ public:
 private:
     uint8_t m_buffer[MaxSize];
     uint8_t* m_curr;
-    // uint8_t* m_top;
-    // uint8_t* m_curr;
 };
 
 #define FORCE_INLINE __attribute__((always_inline))
