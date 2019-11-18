@@ -61,7 +61,7 @@ clean:
 	mv $*.rel $*.o
 
 %.o: src/%.c
-	$(CC) $< -dumpbase $* -O3 -mint8 -msoft-reg-count=0 -auxbase $* -o $*.s
+	$(CC) $< -dumpbase $* $(CFLAGS) -auxbase $* -o $*.s
 	$(AS) $(AFLAGS) $*.s
 	mv $*.rel $*.o
 
