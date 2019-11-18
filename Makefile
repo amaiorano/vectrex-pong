@@ -13,7 +13,7 @@ LFLAGS= -m -u -ws -b .text=0x0
 CC=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1
 CPP=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1plus
 
-BINS  = bouncer1.bin bouncer6.bin
+BINS  = pong.bin
 OBJS  = $(BINS:.bin=.o) crt0.o
 CRT0  = $(BINS:.bin=crt0.o)
 RELS  = $(BINS:.bin=.rel)
