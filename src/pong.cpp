@@ -130,9 +130,20 @@ struct VectorListData {
         return *reinterpret_cast<VectorListData*>(memory);
     }
 
+    // Create new VectorListData from array of (y,x) offsets
+    static VectorListData* Create(int8_t* vertices, int8_t size) {
+        VectorListData* data = (VectorListData*)g_simpleAllocaor.Allocate(size + 1);
+        data->count = size / 2 - 1;
+        memcpy(data->vertices, vertices, size);
+        return data;
+    }
+
     const int8_t* Data() const { return reinterpret_cast<const int8_t*>(this); }
 
+private:
+    // Number of vertices - 1
     int8_t count;
+    // Array of (y,x) offsets to move beam
     int8_t vertices[];
 };
 
@@ -171,7 +182,9 @@ int main() {
     };
 
     VectorList paddle(VectorListData::FromMemory(paddleVertices));
-    VectorList cross(VectorListData::FromMemory(crossVertices));
+    // VectorList cross(VectorListData::FromMemory(crossVertices));
+    VectorListData* crossData = VectorListData::Create(&crossVertices[1], 10);
+    VectorList cross(*crossData);
 
     bios::Init();
 
