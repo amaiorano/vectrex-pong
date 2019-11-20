@@ -1,3 +1,9 @@
+# Game info output to bin header.
+GAME_TITLE = PONG
+GAME_YEAR = $(shell date +'%Y')
+GAME_MUSIC = 0xfd0d
+BIN = pong.bin
+
 CPP=/usr/local/bin/m6809-unknown-none-g++
 CC1PLUS=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1plus
 # CC1=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1
@@ -20,7 +26,7 @@ DEPS = $(OBJS:.o=.d)
 .PHONY = all clean
 .PRECIOUS: %.o %.s19
 
-all: pong.bin
+all: $(BIN)
 
 clean:
 	$(RM) $(OBJS) *.o *.map *.hlr *.ram *.rom *.rst *.s *.s19 *.sym *.asm *.lst *.bin *.d
@@ -56,7 +62,7 @@ clean:
 
 # Produce crt0.asm from crt0.tpl (template) by replacing placeholders with target base name
 crt0.asm:
-	cat make/crt0.tpl | sed -e s/XXX/`echo $* | sed -e "s/crt0//" | tr '[:lower:]' '[:upper:]'`/ > crt0.asm
+	cat make/crt0.tpl | sed -e s/GAME_TITLE/$(GAME_TITLE)/ | sed -e s/GAME_YEAR/$(GAME_YEAR)/ | sed -e s/GAME_MUSIC/$(GAME_MUSIC)/ > crt0.asm
 
 %.o: src/%.cpp
 	# Compile .cpp to asm file (.s)

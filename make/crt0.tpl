@@ -40,11 +40,11 @@
 	;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	.area	.text
-	.ascii "g GCE 2015"		; cartrige id and year
+	.ascii "g GCE GAME_YEAR"		; cartrige id and year
 	.byte 0x80			; string end
-	.word 0xfd0d			; address to music1 in BIOS
+	.word GAME_MUSIC			; address to music1 in BIOS
 	.byte 0xf8, 0x50, 0x20, -0x30	; height, width, rel y, rel x
-	.ascii "XXX"  			; game title
+	.ascii "GAME_TITLE"  			; game title
 	.byte 0x80			; string end
 	.byte 0				; header end
 
