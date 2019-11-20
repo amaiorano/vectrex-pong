@@ -2,13 +2,7 @@
 CC1PLUS=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1plus
 CPP=/usr/local/bin/m6809-unknown-none-g++
 
-#CFLAGS= -Os -g 
-#CFLAGS= -O3 -mint8 -msoft-reg-count=0
-CFLAGS = -O3 -quiet -fno-gcse -fno-toplevel-reorder -fverbose-asm -W -Wall -Wextra -Wconversion -Werror -Wno-comment -Wno-unused-parameter -Wno-return-type -fomit-frame-pointer -mint8 -msoft-reg-count=0 -fno-time-report -fdiagnostics-show-option
-# These includes may modify CFLAGS
-include make/6809.mk
-include make/g++.mk
-include make/gcc.mk
+CFLAGS = -O3 -quiet -fno-inline -fno-gcse -fno-toplevel-reorder -fverbose-asm -W -Wall -Wextra -Wconversion -Werror -Wno-comment -Wno-unused-parameter -Wno-return-type -fomit-frame-pointer -mint8 -msoft-reg-count=0 -fno-time-report -fdiagnostics-show-option
 
 AS=/usr/local/bin/as6809
 AFLAGS=-l -og -sy
@@ -29,13 +23,13 @@ all: pong.bin
 clean:
 	$(RM) $(OBJS) *.o *.map *.hlr *.ram *.rom *.rst *.s *.s19 *.sym *.asm *.lst *.bin *.d
 
-# Include generated dep files for header deps per source file
--include $(DEPS)
-
 # Rule to generate a dep file by using the C preprocessor
 %.d: src/%.cpp
 	echo $(DEPS)
 	$(CPP) $(CFLAGS) $< -MM -MT $(@:.d=.o) > $@
+
+# Include generated dep files for header deps per source file
+-include $(DEPS)
 
 # Produce final .bin file from .s19 and _ram.s19
 %.bin: %.s19 %_ram.s19
