@@ -1,8 +1,10 @@
-# CC1=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1
-CC1PLUS=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1plus
 CPP=/usr/local/bin/m6809-unknown-none-g++
+CC1PLUS=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1plus
+# CC1=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1
 
-CFLAGS = -O3 -quiet -fno-inline -fno-gcse -fno-toplevel-reorder -fverbose-asm -W -Wall -Wextra -Wconversion -Werror -Wno-comment -Wno-unused-parameter -Wno-return-type -fomit-frame-pointer -mint8 -msoft-reg-count=0 -fno-time-report -fdiagnostics-show-option
+CFLAGS = -O3 -fno-inline -fno-gcse -fno-toplevel-reorder -fverbose-asm -W -Wall -Wextra -Wconversion -Werror -Wno-comment -Wno-unused-parameter -Wno-return-type -fomit-frame-pointer -mint8 -msoft-reg-count=0 -fno-time-report -fdiagnostics-show-option
+
+CC1FLAGS = $(CFLAGS) -quiet
 
 AS=/usr/local/bin/as6809
 AFLAGS=-l -og -sy
@@ -25,8 +27,7 @@ clean:
 
 # Rule to generate a dep file by using the C preprocessor
 %.d: src/%.cpp
-	echo $(DEPS)
-	$(CPP) $(CFLAGS) $< -MM -MT $(@:.d=.o) > $@
+	@$(CPP) $(CFLAGS) $< -MM -MT $(@:.d=.o) > $@
 
 # Include generated dep files for header deps per source file
 -include $(DEPS)
@@ -59,7 +60,7 @@ crt0.asm:
 
 %.o: src/%.cpp
 	# Compile .cpp to asm file (.s)
-	$(CC1PLUS) $< -dumpbase $* $(CFLAGS) -auxbase $* -o $*.s
+	$(CC1PLUS) $< -dumpbase $* $(CC1FLAGS) -auxbase $* -o $*.s
 	# Assemble .s to .rel, .lst, .hlr, .sym
 	$(AS) $(AFLAGS) $*.s
 	# Rename .rel to .o
