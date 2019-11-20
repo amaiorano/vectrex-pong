@@ -1,3 +1,4 @@
+#pragma once
 
 /*
  * Vectrex.h
@@ -297,7 +298,7 @@ for example jsrab(x, y) should map x to register 'a' and y to register 'b'
  * Templates for calls with return value
  */
 typedef int8_t (bioscall)();
-int8_t call_bios( bioscall *bc )
+inline int8_t call_bios( bioscall *bc )
 {
   //return (*bc)(); // Doesn't work as BIOS return value is in register A
   asm("jsr ,x\n\t"
