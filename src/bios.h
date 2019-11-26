@@ -25,4 +25,12 @@ namespace bios {
     // Draw vector list
     void Draw(const int8_t* const& vectorList, int8_t relx = 0, int8_t rely = 0,
               uint8_t scale = DefaultScale);
+
+    enum Dpad { Dpad_Left, Dpad_Right, Dpad_Up, Dpad_Down };
+    bool IsDpadDown(uint8_t playerIndex, Dpad dpad);
+
+    enum Button { Button_1 = 0b0001, Button_2 = 0b0010, Button_3 = 0b0100, Button_4 = 0b1000 };
+    bool IsButtonDown(uint8_t playerIndex, Button button);
+    bool IsButtonPressed(uint8_t playerIndex, Button button);
+
 } // namespace bios

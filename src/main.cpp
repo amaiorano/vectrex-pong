@@ -2,6 +2,7 @@
 
 #include "base.h"
 #include "bios.h"
+#include "joystick.h"
 #include "object.h"
 #include "vector_list.h"
 
@@ -51,17 +52,23 @@ int main() {
 
     border.SetPos(-127, -127);
 
+    const Joystick& joystick1 = Joystick::Get(0);
+    // const Joystick& joystick2 = Joystick::Get(1);
+
     while (true) {
         bios::WaitFrame();
 
         const int8_t maxSpeed = 2;
 
-        static int8_t paddleDY = maxSpeed;
-        paddle.Move(0, paddleDY);
-        if (paddle.Top() >= (ScreenMaxY - maxSpeed)) {
-            paddleDY = -paddleDY;
-        } else if (paddle.Bottom() <= (ScreenMinY + maxSpeed)) {
-            paddleDY = -paddleDY;
+        if (joystick1.IsDown(Dpad::Up)) {
+            paddle.Move(0, maxSpeed);
+        } else if (joystick1.IsDown(Dpad::Down)) {
+            paddle.Move(0, -maxSpeed);
+        }
+        if (joystick1.IsDown(Dpad::Left)) {
+            cross.Move(-maxSpeed, 0);
+        } else if (joystick1.IsDown(Dpad::Right)) {
+            cross.Move(maxSpeed, 0);
         }
 
         paddle.Draw();
