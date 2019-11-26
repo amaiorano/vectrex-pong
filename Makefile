@@ -22,14 +22,22 @@ SRCS = $(wildcard src/*.cpp)
 _OBJS = $(SRCS:.cpp=.o)
 OBJS = $(patsubst src/%, %, $(_OBJS))
 DEPS = $(OBJS:.o=.d)
+MAP = $(BIN:.bin=.map)
 
-.PHONY = all clean
+.PHONY = all clean print_stats
 .PRECIOUS: %.o %.s19
 
-all: $(BIN)
+all: $(BIN) print_stats
 
 clean:
 	$(RM) $(OBJS) *.o *.map *.hlr *.ram *.rom *.rst *.s *.s19 *.sym *.asm *.lst *.bin *.d
+
+print_stats: $(MAP)
+	@echo "=== Stats ==="
+	@cat $< | grep l_.data | sed -r 's/[ ]*(.*)  l_.data.*/0x\1/' | xargs printf "data: %d"
+	@cat crt0.lst | grep '.bank ram' | sed -r 's/.*SIZE=(.*)?,.*/\1/' | xargs printf " / %d bytes\n"
+	@cat $< | grep l_.bss | sed -r 's/[ ]*(.*)  l_.bss.*/0x\1/' | xargs printf "bss:  %d bytes\n"
+	@cat $< | grep l_.text | sed -r 's/[ ]*(.*)  l_.text.*/0x\1/' | xargs printf "text: %d bytes\n"
 
 # Rule to generate a dep file by using the C preprocessor
 %.d: src/%.cpp
