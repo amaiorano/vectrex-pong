@@ -1,4 +1,5 @@
 #pragma once
+// clang-format off
 
 /*
  * Vectrex.h
@@ -618,3 +619,4 @@ inline int8_t call_bios( bioscall *bc )
 #define musicc   0xFF7A                 // 
 #define musicd   0xFF8F                 // 
 
+// clang-format on
