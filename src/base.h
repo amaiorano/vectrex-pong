@@ -54,3 +54,13 @@ inline void* memcpy(void* dest, const void* src, size_t size) {
 #endif
     return dest;
 }
+
+template <typename T>
+T min(T lhs, T rhs) {
+    return lhs < rhs ? lhs : rhs;
+}
+
+template <typename T>
+T max(T lhs, T rhs) {
+    return lhs > rhs ? lhs : rhs;
+}

@@ -19,13 +19,13 @@ namespace bios {
 
     void ZeroBeam() { Reset0Ref(); }
 
-    void SetBeamIntensity(uint8_t intensity) { Intensity_a(intensity); }
+    void SetBeamIntensity(int8_t intensity) { Intensity_a(intensity); }
 
     void SetScale(uint8_t scale) { VIA_t1_cnt_lo = scale; }
 
-    void Draw(const int8_t* const& vectorList, uint8_t relx, uint8_t rely, uint8_t scale) {
-        Moveto_d(relx, rely);
+    void Draw(const int8_t* const& vectorList, int8_t relx, int8_t rely, uint8_t scale) {
         SetScale(scale);
+        Moveto_d(relx, rely);
         Draw_VLc(vectorList);
     }
 } // namespace bios
