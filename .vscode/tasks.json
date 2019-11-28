@@ -1,0 +1,42 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "make",
+            "type": "shell",
+            "command": "make",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "launch in vectrexy (WSL)",
+            "type": "shell",
+            "command": [
+                "${workspaceDir}../../vectrexy/build/RelWithDebInfo/vectrexy.exe `wslpath -w -a pong.bin`"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "launch in vectrexy (Windows)",
+            "type": "process",
+            "command": [
+                "/mnt/c/Windows/System32/cmd.exe"
+            ],
+            "args": [
+                "/c",
+                "start",
+                "c:\\code\\vectrexy\\build\\RelWithDebInfo\\vectrexy.exe",
+                "c:\\code\\vectrex-dev\\vectrex-pong\\pong.bin"
+            ],
+            "presentation": {
+                "reveal": "silent",
+            },
+            "problemMatcher": []
+        }
+    ]
+}
