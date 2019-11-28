@@ -33,11 +33,11 @@ public:
         int8_t size = (count + 1) * 2;
         for (int8_t i = 0; i < size; i += 2) {
             y += vertices[i]; // Move to next y position
-            y1 = max(y1, y);
-            y2 = min(y2, y);
+            y1 = std::max(y1, y);
+            y2 = std::min(y2, y);
             x += vertices[i + 1]; // Move to next x position
-            x1 = min(x1, x);
-            x2 = max(x2, x);
+            x1 = std::min(x1, x);
+            x2 = std::max(x2, x);
         }
     }
 

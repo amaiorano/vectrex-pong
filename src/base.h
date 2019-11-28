@@ -55,12 +55,25 @@ inline void* memcpy(void* dest, const void* src, size_t size) {
     return dest;
 }
 
-template <typename T>
-T min(T lhs, T rhs) {
-    return lhs < rhs ? lhs : rhs;
-}
+// Implement missing std stuff
+namespace std {
+    template <typename T>
+    T min(T lhs, T rhs) {
+        return lhs < rhs ? lhs : rhs;
+    }
 
-template <typename T>
-T max(T lhs, T rhs) {
-    return lhs > rhs ? lhs : rhs;
-}
+    template <typename T>
+    T max(T lhs, T rhs) {
+        return lhs > rhs ? lhs : rhs;
+    }
+
+    template <typename T, size_t sz>
+    size_t size(T (&arr)[sz]) {
+        return sz;
+    }
+
+    template <typename T>
+    T abs(T v) {
+        return v >= 0 ? v : -v;
+    }
+} // namespace std
