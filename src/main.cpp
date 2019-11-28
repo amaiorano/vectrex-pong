@@ -13,6 +13,14 @@ const int8_t ScreenMinX = -128;
 const int8_t ScreenMaxY = 127;
 const int8_t ScreenMinY = -128;
 
+bool Collides(const Object& o1, const Object& o2) {
+    return (o1.Left() < o2.Right() && //
+            o1.Right() > o2.Left() && //
+            o1.Bottom() < o2.Top() && //
+            o1.Top() > o2.Bottom()    //
+    );
+}
+
 int main() {
     int8_t paddleVertices[] = {
         3,       // size - 1
@@ -44,36 +52,79 @@ int main() {
         0,    -128, //
     };
 
-    Object paddle(VectorList::FromMemory(paddleVertices));
-    Object cross(VectorList::FromMemory(crossVertices));
+    Object paddle1(VectorList::FromMemory(paddleVertices));
+    Object paddle2(VectorList::FromMemory(paddleVertices));
+    Object ball(VectorList::FromMemory(crossVertices));
     Object border(VectorList::FromMemory(borderVertices));
 
-    bios::Init();
+    paddle1.SetPos(-100, 0);
+    paddle2.SetPos(100, 0);
+    ball.SetPos(0, 50);
 
     border.SetPos(-127, -127);
 
     const Joystick& joystick1 = Joystick::Get(0);
-    // const Joystick& joystick2 = Joystick::Get(1);
+    const Joystick& joystick2 = Joystick::Get(1);
+
+    // Speeds
+    const int8_t paddlesy = 4;
+    int8_t ballsx = 2;
+    int8_t ballsy = 1;
+
+    const size_t numPlayers = 2;
+
+    Object* objects[] = {&paddle1, &paddle2, &ball, &border};
+    Object* paddles[] = {&paddle1, &paddle2};
+    const Joystick* joysticks[] = {&joystick1, &joystick2};
+
+
+    bios::Init();
 
     while (true) {
         bios::WaitFrame();
 
-        const int8_t maxSpeed = 2;
+        for (size_t i = 0; i < numPlayers; ++i) {
+            Object* paddle = paddles[i];
+            const Joystick* joystick = joysticks[i];
 
-        if (joystick1.IsDown(Dpad::Up)) {
-            paddle.Move(0, maxSpeed);
-        } else if (joystick1.IsDown(Dpad::Down)) {
-            paddle.Move(0, -maxSpeed);
-        }
-        if (joystick1.IsDown(Dpad::Left)) {
-            cross.Move(-maxSpeed, 0);
-        } else if (joystick1.IsDown(Dpad::Right)) {
-            cross.Move(maxSpeed, 0);
+            if (joystick->IsDown(Dpad::Up) && paddle->Top() <= (ScreenMaxX - paddlesy)) {
+                paddle->Move(0, paddlesy);
+            } else if (joystick->IsDown(Dpad::Down) &&
+                       paddle->Bottom() >= (ScreenMinY + paddlesy)) {
+                paddle->Move(0, -paddlesy);
+            }
         }
 
-        paddle.Draw();
-        cross.Draw();
-        border.Draw();
+        ball.Move(ballsx, ballsy);
+
+        for (size_t i = 0; i < std::size(paddles); ++i) {
+            Object* paddle = paddles[i];
+            if (Collides(ball, *paddle)) {
+                ballsx = -ballsx;
+                while (Collides(ball, *paddle)) {
+                    ball.Move(ballsx, ballsy);
+                }
+            }
+        }
+
+        int ballSpeedX = std::abs(ballsx);
+        int ballSpeedY = std::abs(ballsy);
+
+        if ((ball.Top() >= (ScreenMaxY - ballSpeedY)) ||
+            ball.Bottom() <= (ScreenMinY + ballSpeedY)) {
+            ballsy = -ballsy;
+            ball.Move(ballsx, ballsy);
+        }
+
+        if ((ball.Right() >= (ScreenMaxX - ballSpeedX)) ||
+            ball.Left() <= (ScreenMinX + ballSpeedX)) {
+            ballsx = -ballsx;
+            ball.Move(ballsx, ballsy);
+        }
+
+        for (size_t i = 0; i < std::size(objects); ++i) {
+            objects[i]->Draw();
+        }
     }
 
     return 0;
