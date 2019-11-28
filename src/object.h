@@ -34,7 +34,7 @@ public:
     int8_t Y() const { return m_y; }
 
     int8_t Left() const { return m_x + m_extents.x1; }
-    int8_t Right() const { return m_y + m_extents.x2; }
+    int8_t Right() const { return m_x + m_extents.x2; }
     int8_t Top() const { return m_y + m_extents.y1; }
     int8_t Bottom() const { return m_y + m_extents.y2; }
 
