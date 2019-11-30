@@ -4,6 +4,7 @@
 #include "bios.h"
 #include "joystick.h"
 #include "object.h"
+#include "text.h"
 #include "vector_list.h"
 
 const uint8_t ScreenWidth = 255;
@@ -52,10 +53,12 @@ int main() {
         0,    -128, //
     };
 
-    Object paddle1(VectorList::FromMemory(paddleVertices));
-    Object paddle2(VectorList::FromMemory(paddleVertices));
-    Object ball(VectorList::FromMemory(crossVertices));
-    Object border(VectorList::FromMemory(borderVertices));
+    static Object paddle1(VectorList::FromMemory(paddleVertices));
+    static Object paddle2(VectorList::FromMemory(paddleVertices));
+    static Object ball(VectorList::FromMemory(crossVertices));
+    static Object border(VectorList::FromMemory(borderVertices));
+    static Text<3> scoreText1(-110, 120);
+    static Text<9> scoreText2(60, 120);
 
     paddle1.SetPos(-100, 0);
     paddle2.SetPos(100, 0);
@@ -77,12 +80,15 @@ int main() {
     Object* paddles[] = {&paddle1, &paddle2};
     const Joystick* joysticks[] = {&joystick1, &joystick2};
 
+    int8_t score1 = 0;
+    int8_t score2 = 0;
 
     bios::Init();
 
     while (true) {
         bios::WaitFrame();
 
+        // Move paddles on player input
         for (size_t i = 0; i < numPlayers; ++i) {
             Object* paddle = paddles[i];
             const Joystick* joystick = joysticks[i];
@@ -95,8 +101,10 @@ int main() {
             }
         }
 
+        // Move the ball
         ball.Move(ballsx, ballsy);
 
+        // Ball-paddle collision
         for (size_t i = 0; i < std::size(paddles); ++i) {
             Object* paddle = paddles[i];
             if (Collides(ball, *paddle)) {
@@ -110,21 +118,36 @@ int main() {
         int ballSpeedX = std::abs(ballsx);
         int ballSpeedY = std::abs(ballsy);
 
+        // If ball hits top or bottom, bounce
         if ((ball.Top() >= (ScreenMaxY - ballSpeedY)) ||
             ball.Bottom() <= (ScreenMinY + ballSpeedY)) {
             ballsy = -ballsy;
             ball.Move(ballsx, ballsy);
         }
 
-        if ((ball.Right() >= (ScreenMaxX - ballSpeedX)) ||
-            ball.Left() <= (ScreenMinX + ballSpeedX)) {
+        // If ball hits side, someone wins a point
+        const bool hitRight = ball.Right() >= (ScreenMaxX - ballSpeedX);
+        if (hitRight || ball.Left() <= (ScreenMinX + ballSpeedX)) {
             ballsx = -ballsx;
             ball.Move(ballsx, ballsy);
+
+            if (hitRight) {
+                ++score1;
+            } else {
+                ++score2;
+            }
         }
 
+        char scoreString[10];
+        scoreText1.SetString(itoa(score1, scoreString));
+        scoreText2.SetString(itoa(score2, scoreString));
+
+        // Draw everything
         for (size_t i = 0; i < std::size(objects); ++i) {
             objects[i]->Draw();
         }
+        scoreText1.Draw();
+        scoreText2.Draw();
     }
 
     return 0;

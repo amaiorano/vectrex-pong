@@ -34,11 +34,13 @@ namespace bios {
 
     void SetScale(uint8_t scale) { VIA_t1_cnt_lo = scale; }
 
-    void Draw(const int8_t* const& vectorList, int8_t relx, int8_t rely, uint8_t scale) {
+    void Draw(const void* vectorList, int8_t relx, int8_t rely, uint8_t scale) {
         SetScale(scale);
         Moveto_d(relx, rely);
         Draw_VLc(vectorList);
     }
+
+    void PrintString(const void* block) { Print_Str_hwyx(block); }
 
     bool IsDpadDown(uint8_t playerIndex, Dpad dpad) {
         static const uint8_t mask[4] = {
@@ -60,6 +62,7 @@ namespace bios {
         }
         return (Vec_Btn_State & mask) != 0;
     }
+
     bool IsButtonPressed(uint8_t playerIndex, Button button) {
         uint8_t mask = (uint8_t)button;
         if (playerIndex) {

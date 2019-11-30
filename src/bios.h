@@ -23,8 +23,10 @@ namespace bios {
     void SetScale(uint8_t scale);
 
     // Draw vector list
-    void Draw(const int8_t* const& vectorList, int8_t relx = 0, int8_t rely = 0,
+    void Draw(const void* vectorList, int8_t relx = 0, int8_t rely = 0,
               uint8_t scale = DefaultScale);
+
+    void PrintString(const void* block);
 
     enum Dpad { Dpad_Left, Dpad_Right, Dpad_Up, Dpad_Down };
     bool IsDpadDown(uint8_t playerIndex, Dpad dpad);

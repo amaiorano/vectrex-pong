@@ -55,6 +55,31 @@ inline void* memcpy(void* dest, const void* src, size_t size) {
     return dest;
 }
 
+inline size_t strlen(const char* s) {
+    size_t len = 0;
+    while (*s++) {
+        ++len;
+    }
+    return len;
+}
+
+inline char* itoa(int value, char* str) {
+    int count = 0;
+    int v = value;
+    do {
+        ++count;
+        v /= 10;
+    } while (v);
+    v = value;
+    str[count] = '\0';
+    while (count) {
+        str[count - 1] = '0' + v % 10;
+        v /= 10;
+        --count;
+    }
+    return str;
+}
+
 // Implement missing std stuff
 namespace std {
     template <typename T>
