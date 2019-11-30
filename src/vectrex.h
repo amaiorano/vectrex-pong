@@ -480,14 +480,24 @@ inline int8_t call_bios(bioscall* bc) {
 
 /* Moveto_d: This routine uses the current scale factor, and moves the pen to the (y,x)
    position specified in D register. */
-#define Moveto_d(x, y) jsrba(x, y, 0xF312) //
+inline void Moveto_d(int8_t x, int8_t y) {
+    jsrba(x, y, 0xF312);
+}
 
-#define Reset0Ref_D0() jsr(0xF34A)   //
-#define Check0Ref() jsr(0xF34F)      //
-#define Reset0Ref() jsr(0xF354)      //
-#define Reset_Pen() jsr(0xF35B)      //
-#define Reset0Int() jsr(0xF36B)      //
-#define Print_Str_hwyx() jsr(0xF373) //
+#define Reset0Ref_D0() jsr(0xF34A) //
+#define Check0Ref() jsr(0xF34F)    //
+#define Reset0Ref() jsr(0xF354)    //
+#define Reset_Pen() jsr(0xF35B)    //
+#define Reset0Int() jsr(0xF36B)    //
+/* This routine prints a single string (up to an 0x80).  The parameter
+   block describing the string is pointed to by the U register.  The
+   format for the parameter block is as follows:
+                                                                         
+         height, width, rel y, rel x, string, 0x80
+*/
+inline void Print_Str_hwyx(const void* const& s) {
+    jsru(s, 0xF373);
+}
 #define Print_Str_yx() jsr(0xF378)   //
 #define Print_Str_d() jsr(0xF37A)    //
 #define Print_List_hw() jsr(0xF385)  //
@@ -510,12 +520,14 @@ inline int8_t call_bios(bioscall* bc) {
 
      count, rel y, rel x, rel y, rel x, ...
 */
-#define Draw_VLc(c) jsrx(c, 0xF3CE) // count y x y x ...
-#define Draw_VL_b() jsr(0xF3D2)     // y x y x ...
-#define Draw_VLcs() jsr(0xF3D6)     // count scale y x y x ...
-#define Draw_VL_ab() jsr(0xF3D8)    // y x y x ...
-#define Draw_VL_a() jsr(0xF3DA)     // y x y x ...
-#define Draw_VL() jsr(0xF3DD)       // y x y x ...
+inline void Draw_VLc(const void* const& c) {
+    jsrx(c, 0xF3CE); // count y x y x ...
+}
+#define Draw_VL_b() jsr(0xF3D2)  // y x y x ...
+#define Draw_VLcs() jsr(0xF3D6)  // count scale y x y x ...
+#define Draw_VL_ab() jsr(0xF3D8) // y x y x ...
+#define Draw_VL_a() jsr(0xF3DA)  // y x y x ...
+#define Draw_VL() jsr(0xF3DD)    // y x y x ...
 
 /* Draw_Line_d: This routine will draw a line from the current pen position,
    to the point specified by the (y,x) pair specified in the D register.
