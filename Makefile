@@ -36,9 +36,10 @@ clean:
 
 print_stats: $(MAP)
 	@echo "=== Stats ==="
-	@cat $< | grep l_.data | sed -r 's/[ ]*(.*)  l_.data.*/0x\1/' | xargs printf "data: %d"
-	@cat crt0.lst | grep '.bank ram' | sed -r 's/.*SIZE=(.*)?,.*/\1/' | xargs printf " / %d bytes\n"
+	@cat $< | grep l_.data | sed -r 's/[ ]*(.*)  l_.data.*/0x\1/' | xargs printf "data: %d bytes\n"
 	@cat $< | grep l_.bss | sed -r 's/[ ]*(.*)  l_.bss.*/0x\1/' | xargs printf "bss:  %d bytes\n"
+	@# TODO: add result of data + bss and show data + bss / total and %
+	@cat crt0.lst | grep '.bank ram' | sed -r 's/.*SIZE=(.*)?,.*/\1/' | xargs printf "max data + bss: %d bytes\n"
 	@cat $< | grep l_.text | sed -r 's/[ ]*(.*)  l_.text.*/0x\1/' | xargs printf "text: %d bytes\n"
 
 # Rule to generate a dep file by using the C preprocessor
