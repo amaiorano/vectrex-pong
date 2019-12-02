@@ -3,6 +3,7 @@ GAME_TITLE = PONG
 GAME_YEAR = $(shell date +'%Y')
 GAME_MUSIC = 0xfd0d
 BIN = pong.bin
+VEC = pong.vec
 
 CPP=/usr/local/bin/m6809-unknown-none-g++
 CC1PLUS=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1plus
@@ -29,18 +30,13 @@ MAP = $(BIN:.bin=.map)
 .PHONY = all clean print_stats
 .PRECIOUS: %.o %.s19
 
-all: $(BIN) print_stats
+all: $(BIN) $(VEC) print_stats
 
 clean:
-	$(RM) $(OBJS) *.o *.map *.hlr *.ram *.rom *.rst *.s *.s19 *.sym *.asm *.lst *.bin *.d
+	$(RM) $(OBJS) *.o *.map *.hlr *.ram *.rom *.rst *.s *.s19 *.sym *.asm *.lst *.bin *.d *.vec
 
-print_stats: $(MAP)
-	@echo "=== Stats ==="
-	@cat $< | grep l_.data | sed -r 's/[ ]*(.*)  l_.data.*/0x\1/' | xargs printf "data: %d bytes\n"
-	@cat $< | grep l_.bss | sed -r 's/[ ]*(.*)  l_.bss.*/0x\1/' | xargs printf "bss:  %d bytes\n"
-	@# TODO: add result of data + bss and show data + bss / total and %
-	@cat crt0.lst | grep '.bank ram' | sed -r 's/.*SIZE=(.*)?,.*/\1/' | xargs printf "max data + bss: %d bytes\n"
-	@cat $< | grep l_.text | sed -r 's/[ ]*(.*)  l_.text.*/0x\1/' | xargs printf "text: %d bytes\n"
+print_stats: $(MAP) crt0.asm
+	@./tools/build/print_stats.py $(MAP) crt0.asm
 
 # Rule to generate a dep file by using the C preprocessor
 %.d: src/%.cpp
@@ -49,7 +45,14 @@ print_stats: $(MAP)
 # Include generated dep files for header deps per source file
 -include $(DEPS)
 
-# Produce final .bin file from .s19 and _ram.s19
+# Produce final .vec file from .bin
+%.vec: %.bin
+	# Pad to multiple of 8K
+	./tools/build/pad_bin.py $< $@
+	# Duplicate file to 32K
+	./tools/build/dup_bin.py $@ 32
+
+# Produce .bin file from .s19 and _ram.s19
 %.bin: %.s19 %_ram.s19
 	# Extract ram section into .ram
 	srec_cat $*_ram.s19 -offset -0xc880 -o $*.ram -binary || echo -n
