@@ -1,5 +1,7 @@
 # Game info output to bin header.
-GAME_TITLE = PONG
+GAME_TITLE_1 = '         PONG'
+GAME_TITLE_2 = '          BY'
+GAME_TITLE_3 = '   ANTONIO MAIORANO'
 GAME_YEAR = $(shell date +'%Y')
 GAME_MUSIC = 0xfd0d
 BIN = pong.bin
@@ -76,7 +78,12 @@ print_stats: $(MAP) crt0.asm
 
 # Produce crt0.asm from crt0.tpl (template) by replacing placeholders with target base name
 crt0.asm:
-	cat make/crt0.tpl | sed -e s/GAME_TITLE/$(GAME_TITLE)/ | sed -e s/GAME_YEAR/$(GAME_YEAR)/ | sed -e s/GAME_MUSIC/$(GAME_MUSIC)/ > crt0.asm
+	cat make/crt0.tpl \
+		| sed -e s/GAME_TITLE_1/$(GAME_TITLE_1)/ \
+		| sed -e s/GAME_TITLE_2/$(GAME_TITLE_2)/ \
+		| sed -e s/GAME_TITLE_3/$(GAME_TITLE_3)/ \
+		| sed -e s/GAME_YEAR/$(GAME_YEAR)/ \
+		| sed -e s/GAME_MUSIC/$(GAME_MUSIC)/ > crt0.asm
 
 %.o: src/%.cpp
 	# Compile .cpp to asm file (.s)
