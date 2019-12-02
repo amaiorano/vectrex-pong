@@ -31,7 +31,7 @@
                 "/c",
                 "start",
                 "c:\\code\\vectrexy\\build\\RelWithDebInfo\\vectrexy.exe",
-                "c:\\code\\vectrex-dev\\vectrex-pong\\pong.bin"
+                "c:\\code\\vectrex-dev\\vectrex-pong\\pong.vec"
             ],
             "presentation": {
                 "reveal": "silent",
