@@ -291,21 +291,21 @@ for example jsrab(x, y) should map x to register 'a' and y to register 'b'
         "jsr " #func "\n\t"                                                                        \
         :                                                                                          \
         : "g"(x), "g"(y)                                                                           \
-        : "d", "x")
+        : "d", "x", "y", "u")
 
 #define jsru(m, func)                                                                              \
     asm("ldu %0\n\t"                                                                               \
         "jsr " #func "\n\t"                                                                        \
         :                                                                                          \
         : "g"(m)                                                                                   \
-        : "d", "x", "u")
+        : "d", "x", "y", "u")
 
 #define jsrx(v, func)                                                                              \
     asm("ldx %0\n\t"                                                                               \
         "jsr " #func "\n\t"                                                                        \
         :                                                                                          \
         : "g"(v)                                                                                   \
-        : "d", "x")
+        : "d", "x", "y")
 
 #define jsrxb(c, s, func)                                                                          \
     asm("ldx %0\n\t"                                                                               \
@@ -480,9 +480,7 @@ inline int8_t call_bios(bioscall* bc) {
 
 /* Moveto_d: This routine uses the current scale factor, and moves the pen to the (y,x)
    position specified in D register. */
-inline void Moveto_d(int8_t x, int8_t y) {
-    jsrba(x, y, 0xF312);
-}
+#define Moveto_d(x, y) jsrba(x, y, 0xF312)
 
 #define Reset0Ref_D0() jsr(0xF34A) //
 #define Check0Ref() jsr(0xF34F)    //
@@ -495,9 +493,8 @@ inline void Moveto_d(int8_t x, int8_t y) {
                                                                          
          height, width, rel y, rel x, string, 0x80
 */
-inline void Print_Str_hwyx(const void* const& s) {
-    jsru(s, 0xF373);
-}
+#define Print_Str_hwyx(s) jsru(s, 0xF373)
+
 #define Print_Str_yx() jsr(0xF378)   //
 #define Print_Str_d() jsr(0xF37A)    //
 #define Print_List_hw() jsr(0xF385)  //
@@ -520,9 +517,8 @@ inline void Print_Str_hwyx(const void* const& s) {
 
      count, rel y, rel x, rel y, rel x, ...
 */
-inline void Draw_VLc(const void* const& c) {
-    jsrx(c, 0xF3CE); // count y x y x ...
-}
+#define Draw_VLc(c) jsrx(c, 0xF3CE)
+
 #define Draw_VL_b() jsr(0xF3D2)  // y x y x ...
 #define Draw_VLcs() jsr(0xF3D6)  // count scale y x y x ...
 #define Draw_VL_ab() jsr(0xF3D8) // y x y x ...
