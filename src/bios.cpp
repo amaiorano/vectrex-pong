@@ -15,6 +15,13 @@ namespace bios {
         Vec_Joy_Mux_2_Y = 7;
     }
 
+    void ShowSelectGameScreen(uint8_t maxNumPlayers, uint8_t numGameModes,
+                              uint8_t& selectedNumPlayers, uint8_t& selectedGameMode) {
+        Select_Game(maxNumPlayers, numGameModes);
+        selectedNumPlayers = Vec_Num_Players;
+        selectedGameMode = Vec_Num_Game;
+    }
+
     void WaitFrame() {
         Wait_Recal();
 

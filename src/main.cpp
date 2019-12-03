@@ -23,6 +23,11 @@ bool Collides(const Object& o1, const Object& o2) {
 }
 
 int main() {
+    bios::Init();
+
+    uint8_t numPlayers = 0, gameMode = 0;
+    bios::ShowSelectGameScreen(2, 5, numPlayers, gameMode);
+
     int8_t paddleVertices[] = {
         3,       // size - 1
         0,   5,  // Top left is local (0,0)
@@ -74,16 +79,12 @@ int main() {
     int8_t ballsx = 2;
     int8_t ballsy = 1;
 
-    const size_t numPlayers = 2;
-
     Object* objects[] = {&paddle1, &paddle2, &ball, &border};
     Object* paddles[] = {&paddle1, &paddle2};
     const Joystick* joysticks[] = {&joystick1, &joystick2};
 
     int8_t score1 = 0;
     int8_t score2 = 0;
-
-    bios::Init();
 
     while (true) {
         bios::WaitFrame();

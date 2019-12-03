@@ -618,18 +618,38 @@ inline int8_t call_bios(bioscall* bc) {
 #define Init_Music_chk(m) jsru(m, 0xF687) //
 #define Init_Music() jsr(0xF68D)          //
 #define Init_Music_x() jsr(0xF692)        //
-#define Select_Game() jsr(0xF7A9)         //
-#define Clear_Score() jsr(0xF84F)         //
-#define Add_Score_a() jsr(0xF85E)         //
-#define Add_Score_d() jsr(0xF87C)         //
-#define Strip_Zeros() jsr(0xF8B7)         //
-#define Compare_Score() jsr(0xF8C7)       //
-#define New_High_Score() jsr(0xF8D8)      //
-#define Obj_Will_Hit_u() jsr(0xF8E5)      //
-#define Obj_Will_Hit() jsr(0xF8F3)        //
-#define Obj_Hit() jsr(0xF8FF)             //
-#define Explosion_Snd() jsr(0xF92E)       //
-#define Draw_Grid_VL() jsr(0xFF9F)        //
+
+// F7A9 Select_Game
+//
+// This routine provides a game with the means for allowing the player to choose the game number
+// he would like to play, and the number of players.  The game indicates the number of game
+// versions available, by placing the  value in the B register.  The number of players allowed
+// is specified in the A register.  If a parameter is passed in with a value of 0, then the
+// corresponding question will not be asked. The number of players selected is returned in
+// $C879, while the game number selected is returned in $C87A.
+//
+// This routine performs most of the work involved in allowing the player to select a game
+// version and the number of players.  It displays the game # and player options, and allows the
+// player a certain amount of time to modify their values.  Anytime one of the buttons is used
+// to modify a value, the timer will be restarted. When a button is pressed, the associated
+// value is modified, and then redisplayed on the screen.  This routine will return when either
+// the timer expires, or button 4 is pressed.
+//
+// After function returns, player's choices are in Vec_Num_Players and Vec_Num_Game.
+#define Select_Game(max_num_players, num_game_versions)                                            \
+    jsrba(num_game_versions, max_num_players, 0xF7A9)
+
+#define Clear_Score() jsr(0xF84F)    //
+#define Add_Score_a() jsr(0xF85E)    //
+#define Add_Score_d() jsr(0xF87C)    //
+#define Strip_Zeros() jsr(0xF8B7)    //
+#define Compare_Score() jsr(0xF8C7)  //
+#define New_High_Score() jsr(0xF8D8) //
+#define Obj_Will_Hit_u() jsr(0xF8E5) //
+#define Obj_Will_Hit() jsr(0xF8F3)   //
+#define Obj_Hit() jsr(0xF8FF)        //
+#define Explosion_Snd() jsr(0xF92E)  //
+#define Draw_Grid_VL() jsr(0xFF9F)   //
 ;
 #define music1 0xFD0D //
 #define music2 0xFD1D //

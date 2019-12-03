@@ -10,6 +10,11 @@ namespace bios {
     // Call once at startup
     void Init();
 
+    // Show the screen where player can select number of players and the game version.
+    // This is a blocking call, and returns once the user pressed button 4, or enough time elapses.
+    void ShowSelectGameScreen(uint8_t maxNumPlayers, uint8_t numGameModes,
+                              uint8_t& selectedNumPlayers, uint8_t& selectedGameMode);
+
     // Call once per frame, beam will be reset to 0,0
     void WaitFrame();
 
