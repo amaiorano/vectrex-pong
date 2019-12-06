@@ -40,4 +40,15 @@ namespace bios {
     bool IsButtonDown(uint8_t playerIndex, Button button);
     bool IsButtonPressed(uint8_t playerIndex, Button button);
 
+    // Play one of the 13 music entries in the bios. Will stop sound, if any.
+    void PlayMusic(uint8_t musicIndex);
+    void StopMusic();
+    bool IsPlayingMusic();
+
+    // Play sound defined by block. Will stop music, if any.
+    // For now, sounds played on channel A and B will have their tone increase quickly until a
+    // threshold is hit, and then the channel is muted.
+    void PlaySound(const void* soundBlock);
+    void StopSound();
+
 } // namespace bios

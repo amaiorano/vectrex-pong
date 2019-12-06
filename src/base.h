@@ -1,5 +1,7 @@
 #pragma once
 
+#define nullptr 0
+
 #define FORCE_INLINE __attribute__((always_inline))
 
 // TODO: implement
