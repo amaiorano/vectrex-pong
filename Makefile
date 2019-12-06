@@ -39,7 +39,7 @@ DEPS = $(OBJS:.o=.d)
 MAP = $(BIN:.bin=.map)
 
 .PHONY = all clean print_stats
-.PRECIOUS: %.o %.s19
+.PRECIOUS: %.o 
 
 all: $(BIN) $(VEC) print_stats
 
