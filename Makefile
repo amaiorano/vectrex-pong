@@ -86,7 +86,7 @@ print_stats: $(MAP) crt0.asm
 	mv $*.rel $*.o
 
 # Produce crt0.asm from crt0.tpl (template) by replacing placeholders with target base name
-crt0.asm:
+crt0.asm: make/crt0.tpl
 	cat make/crt0.tpl \
 		| sed -e s/GAME_TITLE_1/$(GAME_TITLE_1)/ \
 		| sed -e s/GAME_TITLE_2/$(GAME_TITLE_2)/ \
