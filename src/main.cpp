@@ -7,6 +7,29 @@
 #include "text.h"
 #include "vector_list.h"
 
+const uint8_t thruster_sound[] = {0x00, 0x10, // Tone A low
+                                  0x01, 0x00, // Tone A high
+                                  0x06, 0x1F, // Noise
+                                  0x07, 0x06, // Mixer
+                                  0x08, 0x0F, // Amplitude A
+                                  0xFF};
+
+const uint8_t mine_pop_sound[] = {0x00, 0x00, // Tone A low
+                                  0x01, 0x00, // Tone A high
+                                  0x02, 0x30, // Tone B low
+                                  0x03, 0x00, // Tone B high
+                                  0x04, 0x00, // Tone C low
+                                  0x05, 0x00, // Tone C high
+                                  0x06, 0x1F, // Noise
+                                  0x07, 0x3D, // Mixer
+                                  0x08, 0x00, // Amplitude A
+                                  0x09, 0x0F, // Amplitude B
+                                  0x0A, 0x00, // Amplitude C
+                                  0x0B, 0x00, // EnvelopePeriodLow
+                                  0x0C, 0x00, // EnvelopePeriodHigh
+                                  0x0D, 0x00, // EnvelopeShape
+                                  0xFF};
+
 const uint8_t ScreenWidth = 255;
 const uint8_t ScreenHeight = 255;
 const int8_t ScreenMaxX = 127;
@@ -109,6 +132,8 @@ int main() {
         for (size_t i = 0; i < std::size(paddles); ++i) {
             Object* paddle = paddles[i];
             if (Collides(ball, *paddle)) {
+                bios::PlaySound(mine_pop_sound);
+
                 ballsx = -ballsx;
                 while (Collides(ball, *paddle)) {
                     ball.Move(ballsx, ballsy);
@@ -122,6 +147,8 @@ int main() {
         // If ball hits top or bottom, bounce
         if ((ball.Top() >= (ScreenMaxY - ballSpeedY)) ||
             ball.Bottom() <= (ScreenMinY + ballSpeedY)) {
+            bios::PlaySound(thruster_sound);
+
             ballsy = -ballsy;
             ball.Move(ballsx, ballsy);
         }
@@ -129,6 +156,8 @@ int main() {
         // If ball hits side, someone wins a point
         const bool hitRight = ball.Right() >= (ScreenMaxX - ballSpeedX);
         if (hitRight || ball.Left() <= (ScreenMinX + ballSpeedX)) {
+            bios::PlaySound(thruster_sound);
+
             ballsx = -ballsx;
             ball.Move(ballsx, ballsy);
 
