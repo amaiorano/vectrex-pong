@@ -11,7 +11,10 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": []
+            "problemMatcher": [],
+            "presentation": {
+                "clear": true
+            }
         },
         {
             "label": "launch in vectrexy (WSL)",
@@ -19,11 +22,12 @@
             "command": [
                 "${workspaceDir}../../vectrexy/build/RelWithDebInfo/vectrexy.exe `wslpath -w -a pong.bin`"
             ],
-            "problemMatcher": []
+            "problemMatcher": [],
         },
         {
             "label": "launch in vectrexy (Windows)",
             "type": "process",
+            "dependsOn": "make",
             "command": [
                 "/mnt/c/Windows/System32/cmd.exe"
             ],
