@@ -276,7 +276,14 @@ for example jsrab(x, y) should map x to register 'a' and y to register 'b'
 //#define bjsr(func)           asm("jsr " #func "\n\t"		\
 //				 "tfr a, b\n\t" : : : "d", "x")
 
+#define args1(a) a
+#define args2(a, b) a, b
+#define args3(a, b, c) a, b, c
+#define args4(a, b, c, d) a, b, c, d
+
 #define jsr(func) asm("jsr " #func "\n\t" : : : "d", "x")
+
+#define jsr_clobber(func, clobber) asm("jsr " #func "\n\t" : : : clobber)
 
 #define jsra(i, func)                                                                              \
     asm("lda %0\n\t"                                                                               \
@@ -293,12 +300,27 @@ for example jsrab(x, y) should map x to register 'a' and y to register 'b'
         : "g"(x), "g"(y)                                                                           \
         : "d", "x", "y", "u")
 
+#define jsrba_clobber(x, y, func, clobber)                                                         \
+    asm("lda %1\n\t"                                                                               \
+        "ldb %0\n\t"                                                                               \
+        "jsr " #func "\n\t"                                                                        \
+        :                                                                                          \
+        : "g"(x), "g"(y)                                                                           \
+        : clobber)
+
 #define jsru(m, func)                                                                              \
     asm("ldu %0\n\t"                                                                               \
         "jsr " #func "\n\t"                                                                        \
         :                                                                                          \
         : "g"(m)                                                                                   \
         : "d", "x", "y", "u")
+
+#define jsru_clobber(m, func, clobber)                                                             \
+    asm("ldu %0\n\t"                                                                               \
+        "jsr " #func "\n\t"                                                                        \
+        :                                                                                          \
+        : "g"(m)                                                                                   \
+        : clobber)
 
 #define jsrx(v, func)                                                                              \
     asm("ldx %0\n\t"                                                                               \
@@ -372,13 +394,36 @@ inline int8_t call_bios(bioscall* bc) {
    The refresh rate is calculated as follows: rate = (C83E)(C83D) / 1.5 mhz */
 #define Set_Refresh() jsr(0xF1A2)
 
-/* DP_to_D0: Sets the DP register to 0xD0, so that all direct page addressing will
-   start at 0xD000 (the hardware I/O area). */
-#define DP_to_D0() jsr(0xF1AA)
+/*
+;-----------------------------------------------------------------------;
+;       F1AA    DP_to_D0                                                ;
+;                                                                       ;
+; Sets the DP register to $D0, so that all direct page addressing will  ;
+; start at $D000 (the hardware I/O area).                               ;
+;                                                                       ;
+; EXIT: dp = $D0                                                        ;
+;       A-reg = $D0                                                     ;
+;-----------------------------------------------------------------------;
+*/
+inline void DP_to_D0() {
+    jsr_clobber(0xF1AA, args1("d"));
+}
 
-/* DP_to_C8: Sets the DP register to 0xC8, so that all direct page addressing will
-   start at 0xC800 (OS RAM area). */
-#define DP_to_C8() jsr(0xF1AF)
+/*
+;-----------------------------------------------------------------------;
+;       F1AF    DP_to_C8                                                ;
+;                                                                       ;
+; Sets the DP register to $C8, so that all direct page addressing will  ;
+; start at $C800 (OS RAM area).                                         ;
+;                                                                       ;
+;                                                                       ;
+; EXIT: dp = $C8                                                        ;
+;       A-reg = $C8                                                     ;
+;-----------------------------------------------------------------------;
+*/
+inline void DP_to_C8() {
+    jsr_clobber(0xF1AF, args1("a"));
+}
 
 /* Read_Btns:  reads the button states on the two joysticks, and return their state
    in the following RAM locations:
@@ -428,19 +473,109 @@ inline int8_t call_bios(bioscall* bc) {
 > 0 if joystick is right or up of center.*/
 #define Joy_Digital() jsr(0xF1F8)
 
-#define Sound_Byte() jsr(0xF256)
+/*
+;-----------------------------------------------------------------------;
+;       F256    Sound_Byte                                              ;
+;       F259    Sound_Byte_x                                            ;
+;       F25B    Sound_Byte_raw                                          ;
+;                                                                       ;
+; All of these routines cause a byte of music data to be written to     ;
+; the music chip.  Sound_Byte stores a shadow copy of the data into     ;
+; $C800-$C80E, and Sound_Byte_x stores a shadow copy into a 15 byte     ;
+; area pointed to by the X register.  Sound_Byte_raw does not store a   ;
+; shadow copy of the data at all.                                       ;
+;                                                                       ;
+; ENTRY DP = $D0                                                        ;
+;       A-reg = which of the 15 sound chip registers to modify          ;
+;       B-reg = the byte of sound data                                  ;
+;       X-reg = 15 byte shadow area (Sound_Byte_x only)                 ;
+;                                                                       ;
+; EXIT: X-reg = $C800 (Sound_Byte only)                                 ;
+;                                                                       ;
+;       D-reg trashed                                                   ;
+;-----------------------------------------------------------------------;
+*/
+inline void Sound_Byte(uint8_t reg, uint8_t value) {
+    jsrba_clobber(value, reg, 0xF256, args1("d"));
+}
 
 #define Sound_Byte_x() jsr(0xF259)   //
 #define Sound_Byte_raw() jsr(0xF25B) //
-#define Clear_Sound() jsr(0xF272)    //
-#define Sound_Bytes() jsr(0xF27D)    //
-#define Sound_Bytes_x() jsr(0xF284)  //
-#define Do_Sound() jsr(0xF289)       //
-#define Do_Sound_x() jsr(0xF28C)     //
-#define Intensity_1F() jsr(0xF29D)   //
-#define Intensity_3F() jsr(0xF2A1)   //
-#define Intensity_5F() jsr(0xF2A5)   //
-#define Intensity_7F() jsr(0xF2A9)   //
+
+/*
+;-----------------------------------------------------------------------;
+;       F272    Clear_Sound                                             ;
+;                                                                       ;
+; This routine clears the 15 registers on the music chip and the soft   ;
+; copy of their values (C800-C80E), by writing a byte of 0 to each      ;
+; register.  This causes the sound chip to not make any sounds.         ;
+;                                                                       ;
+; ENTRY DP = $D0                                                        ;
+;                                                                       ;
+;       D-reg, X-reg trashed                                            ;
+;-----------------------------------------------------------------------;
+*/
+inline void Clear_Sound() {
+    jsr_clobber(0xF272, args2("d", "x"));
+}
+
+/*
+;-----------------------------------------------------------------------;
+;       F27D    Sound_Bytes                                             ;
+;       F284    Sound_Bytes_x? (apparently never used)                  ;
+;                                                                       ;
+; This routine copies a block of sound information into the sound       ;
+; chip buffer (at $C800-$C80E) and into the registers on the music      ;
+; chip.  The format for the block of sound data is as follows:          ;
+;                                                                       ;
+;   (register number), (music data),                                    ;
+;   (register number), (music data),                                    ;
+;         .                  .                                          ;
+;         .                  .                                          ;
+;       0xFF                                                            ;
+;                                                                       ;
+; As long as the register number is >= 0, then the music data will be   ;
+; copied; however, as soon as a register number < 0 is encountered,     ;
+; the copy will stop.                                                   ;
+;                                                                       ;
+; ENTRY DP = $D0                                                        ;
+;       U-reg = pointer to the block of sound data                      ;
+;                                                                       ;
+;       D-reg, X-reg, U-reg trashed                                     ;
+;-----------------------------------------------------------------------;
+*/
+inline void Sound_Bytes(const void* soundBlock) {
+    // Linker fails to link if we don't include "y" in clobber list for some reason.
+    jsru_clobber(soundBlock, 0xF27D, args4("d", "x", "y", "u"));
+}
+#define Sound_Bytes_x() jsr(0xF284) //
+
+/*
+;-----------------------------------------------------------------------;
+;       F289    Do_Sound                                                ;
+;       F28C    Do_Sound_x? (apparently never used)                     ;
+;                                                                       ;
+; This routine will start/continue making the sound which was first     ;
+; set up by your call to Init_Music.  This routine should normally      ;
+; be called right after your call to Wait_Recal.  It takes the next     ;
+; music information, contained in the music buffer $C83F-$C84C, and     ;
+; updates only those registers which differ from the last data written  ;
+; to the sound chip.                                                    ;
+;                                                                       ;
+; ENTRY DP = $D0                                                        ;
+;                                                                       ;
+;       D-reg, X-reg, U-reg trashed                                     ;
+;-----------------------------------------------------------------------;
+*/
+inline void Do_Sound() {
+    jsr_clobber(0xF289, args3("d", "x", "u"));
+}
+
+#define Do_Sound_x() jsr(0xF28C)   //
+#define Intensity_1F() jsr(0xF29D) //
+#define Intensity_3F() jsr(0xF2A1) //
+#define Intensity_5F() jsr(0xF2A5) //
+#define Intensity_7F() jsr(0xF2A9) //
 
 /* Intensity_a: setting the vector/dot intensity (commonly used to denote the z axis)
    to a specific value. 0x00 is the lowest intensity, and 0x7F is the brightest
@@ -490,7 +625,7 @@ inline int8_t call_bios(bioscall* bc) {
 /* This routine prints a single string (up to an 0x80).  The parameter
    block describing the string is pointed to by the U register.  The
    format for the parameter block is as follows:
-                                                                         
+
          height, width, rel y, rel x, string, 0x80
 */
 #define Print_Str_hwyx(s) jsru(s, 0xF373)
@@ -581,43 +716,60 @@ inline int8_t call_bios(bioscall* bc) {
 #define Move_Mem_a_1() jsr(0xF67F)       //
 #define Move_Mem_a() jsr(0xF683)         //
 
-/* Init_Music_chk: These routines are responsible for filling the music work
-   buffer while a sound is being made. It should be called once during each
-   refresh cycle. If you want to start a new sound, then you must set $C856
-   to 0x01, and point the U-register to the sound block. If no sound is in
-   progress ($C856 = 0), then it returns immediately (unless you called
-   Init_Music or Init_Music_dft, which do not make this check). When a sound
-   is in progress, $C856 will be set to 0x80.
-
-   These routines process a single note at a time, and calculate the amplitude
-   and course/fine tuning values for the 3 sound channels. The values
-   calculated are stored in the music work buffer, at $C83F-$C84C.
-
-  Music data format:
-
-  header word -> $C84F 32 nibble ADSR table
-  header word -> $C851 8-byte "twang" table
-  data bytes
-
-   The ADSR table is simply 32 nibbles (16 bytes) of amplitude values.
-
-   The twang table is 8 signed bytes to modify the base frequency of each note
-   being played. Each channel has a different limit to its twang table index
-   (6-8) to keep them out of phase to each other.
-
-  Music data bytes:
-
-   Bits 0-5 = frequency
-   Bit 6 clear = tone
-   Bit 6 set = noise
-   Bit 7 set = next music data byte is for next channel
-   Bit 7 clear, play note with duration in next music data byte:
-   bits 0-5 = duration
-   bit 6 = unused
-   bit 7 set = end of music */
-#define Init_Music_chk(m) jsru(m, 0xF687) //
-#define Init_Music() jsr(0xF68D)          //
-#define Init_Music_x() jsr(0xF692)        //
+/*
+;-----------------------------------------------------------------------;
+;       F687    Init_Music_chk                                          ;
+;       F68D    Init_Music                                              ;
+;       F692    Init_Music_dft                                          ;
+;                                                                       ;
+; These routines are responsible for filling the music work buffer      ;
+; while a sound is being made.  It should be called once during each    ;
+; refresh cycle.  If you want to start a new sound, then you must set   ;
+; $C856 to 0x01, and point the U-register to the sound block.  If no    ;
+; sound is in progress ($C856 = 0), then it returns immediately         ;
+; (unless you called Init_Music or Init_Music_dft, which do not make    ;
+; this check).  When a sound is in progress, $C856 will be set to 0x80. ;
+;                                                                       ;
+; These routines process a single note at a time, and calculate the     ;
+; amplitude and course/fine tuning values for the 3 sound channels.     ;
+; The values calculated are stored in the music work buffer, at         ;
+; $C83F-$C84C.                                                          ;
+;                                                                       ;
+; Music data format:                                                    ;
+;                                                                       ;
+;       header word -> $C84F  32 nibble ADSR table                      ;
+;       header word -> $C851  8-byte "twang" table                      ;
+;       data bytes                                                      ;
+;                                                                       ;
+; The ADSR table is simply 32 nibbles (16 bytes) of amplitude values.   ;
+;                                                                       ;
+; The twang table is 8 signed bytes to modify the base frequency of     ;
+; each note being played.  Each channel has a different limit to its    ;
+; twang table index (6-8) to keep them out of phase to each other.      ;
+;                                                                       ;
+; Music data bytes:                                                     ;
+;       Bits 0-5 = frequency                                            ;
+;       Bit 6 clear = tone                                              ;
+;       Bit 6 set = noise                                               ;
+;       Bit 7 set = next music data byte is for next channel            ;
+;       Bit 7 clear, play note with duration in next music data byte:   ;
+;               bits 0-5 = duration                                     ;
+;               bit 6 = unused                                          ;
+;               bit 7 set = end of music                                ;
+;                                                                       ;
+; ENTRY DP = $C8                                                        ;
+;       U-reg points to the start of the music data                     ;
+;       $C84D points to frequency table (Init_Music_dft only)           ;
+;       $C856 may need to be set.                                       ;
+;                                                                       ;
+;       D-reg, X-reg, Y-reg, U-reg trashed                              ;
+;-----------------------------------------------------------------------;
+*/
+inline void Init_Music_chk(const void* music) {
+    jsru_clobber(music, 0xF687, args4("d", "x", "y", "u"));
+}
+#define Init_Music() jsr(0xF68D)   //
+#define Init_Music_x() jsr(0xF692) //
 
 // F7A9 Select_Game
 //
@@ -664,3 +816,8 @@ inline int8_t call_bios(bioscall* bc) {
 #define musicb 0xFF62 //
 #define musicc 0xFF7A //
 #define musicd 0xFF8F //
+
+#undef args1
+#undef args2
+#undef args3
+#undef args4
