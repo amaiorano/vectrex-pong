@@ -51,7 +51,8 @@ namespace {
             // This is adapted from Mine Storm, which "slides" Tone A and B channel frequencies
             // up, and mute the channel after hitting a threshold. We may want to do something
             // more general/programmable.
-            {
+            const bool DO_SLIDE = false;
+            if (DO_SLIDE) {
                 volatile uint8_t* sndShadow = &Vec_Snd_Shadow;
 
                 uint16_t toneA = sndShadow[PsgReg::ToneALow];
