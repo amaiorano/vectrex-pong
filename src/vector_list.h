@@ -11,8 +11,8 @@ public:
 
     VectorList() {}
 
-    static VectorList& FromMemory(int8_t* volatile memory) {
-        return *reinterpret_cast<VectorList*>(memory);
+    static const VectorList& FromMemory(const int8_t* volatile memory) {
+        return *reinterpret_cast<const VectorList*>(memory);
     }
 
     // Create new VectorList from array of (y,x) offsets

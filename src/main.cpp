@@ -51,7 +51,7 @@ int main() {
     uint8_t numPlayers = 0, gameMode = 0;
     bios::ShowSelectGameScreen(2, 5, numPlayers, gameMode);
 
-    int8_t paddleVertices[] = {
+    static const int8_t paddleVertices[] = {
         3,       // size - 1
         0,   5,  // Top left is local (0,0)
         -20, 0,  //
@@ -60,7 +60,7 @@ int main() {
     };
 
     const int SIZE = 4;
-    int8_t crossVertices[] = {
+    static const int8_t crossVertices[] = {
         4,                   //
         SIZE / 2,  SIZE / 2, //
         -SIZE,     -SIZE,    //
@@ -69,7 +69,7 @@ int main() {
         SIZE,      -SIZE,    //
     };
 
-    int8_t borderVertices[] = {
+    static const int8_t borderVertices[] = {
         7,          //
         127,  0,    //
         127,  0,    //
