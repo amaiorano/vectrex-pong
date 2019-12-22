@@ -15,7 +15,7 @@ CFLAGS =
 CFLAGS += -O3
 CFLAGS += -fomit-frame-pointer
 CFLAGS += -mint8
-CFLAGS += -fno-inline 
+# CFLAGS += -fno-inline 
 CFLAGS += -fno-gcse
 CFLAGS += -fno-toplevel-reorder
 # Don't emit thread-safe guards around local static variables
