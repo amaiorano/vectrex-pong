@@ -7,6 +7,7 @@
 #include "psg_util.h"
 #include "text.h"
 #include "vector_list.h"
+#include "vectrexy.h"
 
 const uint8_t ScreenWidth = 255;
 const uint8_t ScreenHeight = 255;
@@ -151,6 +152,8 @@ int main() {
             } else {
                 ++score2;
             }
+
+            vectrexy::printf("score 1: %d, score2: %d\n", score1, score2);
         }
 
         char scoreString[10];
