@@ -47,7 +47,7 @@ clean:
 	$(RM) $(OBJS) *.o *.map *.hlr *.ram *.rom *.rst *.s *.s19 *.sym *.asm *.lst *.bin *.d *.vec
 
 print_stats: $(MAP) crt0.asm
-	@./tools/build/print_stats.py $(MAP) crt0.asm
+	@python3 ./tools/build/print_stats.py $(MAP) crt0.asm
 
 # Rule to generate a dep file by using the C preprocessor
 %.d: src/%.cpp
@@ -59,9 +59,9 @@ print_stats: $(MAP) crt0.asm
 # Produce final .vec file from .bin
 %.vec: %.bin
 	# Pad to multiple of 8K
-	./tools/build/pad_bin.py $< $@
+	python3 ./tools/build/pad_bin.py $< $@
 	# Duplicate file to 32K
-	./tools/build/dup_bin.py $@ 32
+	python3 ./tools/build/dup_bin.py $@ 32
 
 # Produce .bin file from .s19 and _ram.s19
 %.bin: %.s19 %_ram.s19
