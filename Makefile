@@ -4,8 +4,8 @@ GAME_TITLE_2 = '          BY'
 GAME_TITLE_3 = '   ANTONIO MAIORANO'
 GAME_YEAR = $(shell date +'%Y')
 GAME_MUSIC = 0xfd0d
-BIN = pong.bin
-VEC = pong.vec
+BIN = vectrex-pong.bin
+VEC = vectrex-pong.vec
 
 CPP=/usr/local/bin/m6809-unknown-none-g++
 CC1PLUS=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1plus
