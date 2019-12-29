@@ -28,10 +28,20 @@
             }
         },
         {
+            // Use ubuntu-gcc6809 docker image to make clean
+            "label": "make clean (Docker)",
+            "type": "shell",
+            "command": "docker run -v ${workspaceFolder}:/root/${workspaceFolderBasename} -t -i amaiorano/gcc6809 make clean -C ${workspaceFolderBasename}",
+            "problemMatcher": [],
+            "presentation": {
+                "clear": true
+            }
+        },
+        {
             "label": "launch in vectrexy",
             "type": "shell",
             "dependsOn": "make (Docker)",
-            "command": "${workspaceFolder}/../../vectrexy/build/RelWithDebInfo/vectrexy.exe ${workspaceFolderBasename}.bin",
+            "command": "${env:VECTREXY} ${workspaceFolder}/${workspaceFolderBasename}.bin",
             "problemMatcher": []
         },
         {
@@ -45,8 +55,8 @@
             "args": [
                 "/c",
                 "start",
-                "c:\\code\\vectrexy\\build\\RelWithDebInfo\\vectrexy.exe",
-                "c:\\code\\vectrex-dev\\vectrex-pong\\pong.vec"
+                "${env:VECTREXY}",
+                "${workspaceFolder}/${workspaceFolderBasename}.bin"
             ],
             "presentation": {
                 "reveal": "silent",
