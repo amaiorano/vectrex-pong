@@ -4,9 +4,20 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "make",
+            "label": "make (Linux)",
             "type": "shell",
             "command": "make",
+            "group": "build",
+            "problemMatcher": [],
+            "presentation": {
+                "clear": true
+            }
+        },
+        {
+            // Use ubuntu-gcc6809 docker image to make
+            "label": "make (Docker)",
+            "type": "shell",
+            "command": "docker run -v ${workspaceFolder}:/root/${workspaceFolderBasename} -t -i amaiorano/gcc6809 make -C ${workspaceFolderBasename}",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -17,19 +28,19 @@
             }
         },
         {
-            "label": "launch in vectrexy (WSL)",
+            "label": "launch in vectrexy",
             "type": "shell",
-            "command": [
-                "${workspaceDir}../../vectrexy/build/RelWithDebInfo/vectrexy.exe `wslpath -w -a pong.bin`"
-            ],
-            "problemMatcher": [],
+            "dependsOn": "make (Docker)",
+            "command": "${workspaceFolder}/../../vectrexy/build/RelWithDebInfo/vectrexy.exe ${workspaceFolderBasename}.bin",
+            "problemMatcher": []
         },
         {
+            // This version launches a separate console window, which can be used for debugging
             "label": "launch in vectrexy (Windows)",
             "type": "process",
-            "dependsOn": "make",
+            "dependsOn": "make (Docker)",
             "command": [
-                "/mnt/c/Windows/System32/cmd.exe"
+                "cmd.exe"
             ],
             "args": [
                 "/c",
