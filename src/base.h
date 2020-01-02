@@ -4,9 +4,6 @@
 
 #define FORCE_INLINE __attribute__((always_inline))
 
-// TODO: implement
-#define assert(cond)
-
 // Use CONCAT to concatenate names with macros like __COUNTER__
 #define CONCAT_(x, y) x##y
 #define CONCAT(x, y) CONCAT_(x, y)
@@ -30,6 +27,15 @@ static_assert(sizeof(uint8_t) == 1);
 static_assert(sizeof(int8_t) == 1);
 static_assert(sizeof(uint16_t) == 2);
 static_assert(sizeof(int16_t) == 2);
+
+namespace detail {
+    void AssertHandler(const char* cond, const char* file, size_t line);
+}
+#define assert(cond)                                                                               \
+    do {                                                                                           \
+        if (!(cond))                                                                               \
+            detail::AssertHandler(#cond, __FILE__, __LINE__);                                      \
+    } while (false)
 
 // Default placement new. Simply returns second argument.
 inline void* operator new(size_t, void* mem) {
