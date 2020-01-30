@@ -12,10 +12,19 @@ CC1PLUS=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1plus
 # CC1=/usr/local/libexec/gcc/m6809-unknown-none/4.3.[46]/cc1
 
 CFLAGS =
-CFLAGS += -O3
+
+# To make a debug build: make DEBUG=1
+# TODO: Output to out/Debug/ and out/Release/ so that we don't have to clean when switching config.
+DEBUG ?= 0
+ifeq ($(DEBUG), 1)
+    CFLAGS += -O0 -g
+else
+    CFLAGS += -DNDEBUG -O3
+endif
+
 CFLAGS += -fomit-frame-pointer
 CFLAGS += -mint8
-# CFLAGS += -fno-inline 
+#CFLAGS += -fno-inline 
 CFLAGS += -fno-gcse
 CFLAGS += -fno-toplevel-reorder
 # Don't emit thread-safe guards around local static variables
@@ -27,10 +36,20 @@ CFLAGS += -W -Wall -Wextra -Wconversion -Werror -Wno-comment -Wno-unused-paramet
 CC1FLAGS = $(CFLAGS) -quiet
 
 AS=/usr/local/bin/as6809
-AFLAGS=-l -og -sy
+AFLAGS= -l -o -s -g -p
+# -l   Create list   file/outfile[.lst]
+# -o   Create object file/outfile[.rel]
+# -s   Create symbol file/outfile[.sym]
+# -g   Undefined symbols made global
+# -p   Disable automatic listing pagination
 
 LN=/usr/local/bin/aslink
-LFLAGS= -m -u -ws -b .text=0x0 
+LFLAGS= -m -w -u -s -b .text=0x0
+#  -m   Map output generated as (out)file[.map]
+#  -w   Wide listing format for map file
+#  -u   Update listing file(s) with link data as file(s)[.rst]
+#  -s   Motorola S Record as (out)file[.s--]
+#  -b   area base address=expression
 
 SRCS = $(wildcard src/*.cpp)
 _OBJS = $(SRCS:.cpp=.o)
