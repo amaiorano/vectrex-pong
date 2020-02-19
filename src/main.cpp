@@ -72,7 +72,7 @@ int main() {
     static Object ball(VectorList::FromMemory(crossVertices));
     static Object border(VectorList::FromMemory(borderVertices));
     static Text<3> scoreText1(-110, 120);
-    static Text<9> scoreText2(60, 120);
+    static Text<3> scoreText2(60, 120);
 
     paddle1.SetPos(-100, 0);
     paddle2.SetPos(100, 0);
