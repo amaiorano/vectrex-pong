@@ -28,6 +28,20 @@
             }
         },
         {
+            // Use ubuntu-gcc6809 docker image to make debug
+            "label": "make DEBUG (Docker)",
+            "type": "shell",
+            "command": "docker run -v ${workspaceFolder}:/root/${workspaceFolderBasename} -t -i amaiorano/gcc6809 make DEBUG=1 -C ${workspaceFolderBasename}",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "clear": true
+            }
+        },
+        {
             // Use ubuntu-gcc6809 docker image to make clean
             "label": "make clean (Docker)",
             "type": "shell",
