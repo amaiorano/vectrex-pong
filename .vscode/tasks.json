@@ -46,6 +46,10 @@
             "label": "make clean (Docker)",
             "type": "shell",
             "command": "docker run -v ${workspaceFolder}:/root/${workspaceFolderBasename} -t -i amaiorano/gcc6809 make clean -C ${workspaceFolderBasename}",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": [],
             "presentation": {
                 "clear": true
