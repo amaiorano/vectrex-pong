@@ -72,6 +72,8 @@ namespace vectrexy {
         };
     } // namespace detail
 
+    inline void printf(const char* format) { DEV_PRINTF_FORMAT = format; }
+
     template <typename A1>
     void printf(const char* format, A1 a1) {
         detail::PushArg<A1>::Exec(a1);
