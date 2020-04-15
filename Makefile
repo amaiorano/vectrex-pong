@@ -54,13 +54,15 @@ LFLAGS= -m -w -u -s -b .text=0x0
 SRCS = $(wildcard src/*.cpp)
 _OBJS = $(SRCS:.cpp=.o)
 OBJS = $(patsubst src/%, %, $(_OBJS))
+_RSTS = $(SRCS:.cpp=.rst)
+RSTS = $(patsubst src/%, %, $(_RSTS))
 DEPS = $(OBJS:.o=.d)
 MAP = $(BIN:.bin=.map)
 
 .PHONY = all clean print_stats
 .PRECIOUS: %.o 
 
-all: $(BIN) $(VEC) print_stats
+all: $(VEC) print_stats
 
 clean:
 	$(RM) $(OBJS) *.o *.map *.hlr *.ram *.rom *.rst *.s *.s19 *.sym *.asm *.lst *.bin *.d *.vec
@@ -94,8 +96,10 @@ print_stats: $(MAP) crt0.asm
 
 # Link all .o files into single .s19 and _ram.s19
 %.s19 %_ram.s19: $(OBJS) crt0.o
-	# Link .o files to .s19, _ram.s19, .rst, .map
+	# Link .o files to .s19, _ram.s19, and .map, and generate .rst for each .o
 	$(LN) $(LFLAGS) $*.s19 crt0.o $(OBJS)
+	# Demangle C/C++ names in .rst files
+	$(foreach RST,$(RSTS),cat $(RST)|c++filt|sponge $(RST);)
 
 # Produce .o from .asm
 %.o: %.asm
